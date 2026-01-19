@@ -4,6 +4,18 @@
 
 Comprehensive market analytics using Binance public REST API. No authentication required.
 
+![POC](https://img.shields.io/badge/readiness-poc-orange.svg)
+
+## Production Readiness
+
+**Level: POC**
+
+This system demonstrates prototyping-focused REST API integration with:
+- **Multi-endpoint integration** combining 7 Binance public endpoints
+- **Dataclass-based parsing** for type-safe response handling
+- **Connection pooling** for optimized API performance
+- **Multi-timeframe analysis** for comprehensive market insights
+
 > **System Prototyping Focus**: REST API integration with dataclass-based response parsing and market analytics
 
 ## Part of RATUProject
@@ -163,12 +175,21 @@ ratu-rest-api/
 | No auth | Public endpoints only, no API key needed |
 | Multi-timeframe | 1h, 4h, 1d klines for trend analysis |
 
+## Notable Code
+
+This repository demonstrates prototyping-focused REST API integration patterns. See [NOTABLE_CODE.md](NOTABLE_CODE.md) for detailed code examples highlighting:
+
+- Multi-endpoint integration
+- Dataclass-based response parsing
+- Multi-timeframe analysis
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Author
 
-**Adityo Nugroho**
-- GitHub: https://github.com/adityonugrohoid
+**Adityo Nugroho**  
+- Portfolio: https://adityonugrohoid.github.io  
+- GitHub: https://github.com/adityonugrohoid  
 - LinkedIn: https://www.linkedin.com/in/adityonugrohoid/

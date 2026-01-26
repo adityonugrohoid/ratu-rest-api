@@ -1,7 +1,5 @@
 # Notable Code: RATU REST API
 
-**Production Readiness Level:** POC
-
 This document highlights key code sections that demonstrate the technical strengths and architectural patterns implemented in this market analytics tool.
 
 ## Overview

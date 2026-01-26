@@ -1,26 +1,13 @@
 # RATU REST API
 
-[Python 3.10+](https://www.python.org/downloads/) | [uv](https://github.com/astral-sh/uv) | [RATUProject](https://github.com/adityonugrohoid)
+![Python](https://img.shields.io/badge/python-3.10+-blue.svg)
+![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)
+![RATUProject](https://img.shields.io/badge/project-RATU-blueviolet.svg)
 
 Comprehensive market analytics using Binance public REST API. No authentication required.
 
-![POC](https://img.shields.io/badge/readiness-poc-orange.svg)
-
-## Production Readiness
-
-**Level: POC**
-
-This system demonstrates prototyping-focused REST API integration with:
-- **Multi-endpoint integration** combining 7 Binance public endpoints
-- **Dataclass-based parsing** for type-safe response handling
-- **Connection pooling** for optimized API performance
-- **Multi-timeframe analysis** for comprehensive market insights
-
+> 🔗 **Part of the RATUProject** | Real-time Automated Trading Unified  
 > **System Prototyping Focus**: REST API integration with dataclass-based response parsing and market analytics
-
-## Part of RATUProject
-
-This repository is part of **RATUProject** (Real-time Automated Trading Unified) - an open-source portfolio demonstrating real-time, event-driven system design for financial markets and blockchain integrations.
 
 ## Features
 

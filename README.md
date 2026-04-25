@@ -1,43 +1,118 @@
+<div align="center">
+
 # RATU REST API
 
-![Python](https://img.shields.io/badge/python-3.10+-blue.svg)
-![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)
-![RATUProject](https://img.shields.io/badge/project-RATU-blueviolet.svg)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![RATU Project](https://img.shields.io/badge/project-RATU-blueviolet.svg)](https://github.com/adityonugrohoid/ratu-template)
+[![Status](https://img.shields.io/badge/status-active-success.svg)](#)
 
-Comprehensive market analytics using Binance public REST API. No authentication required.
+**Comprehensive Binance market snapshots — price, depth, trade flow, and multi-timeframe klines via the public REST API. No auth required.**
 
-> 🔗 **Part of the RATUProject** | Real-time Automated Trading Unified  
-> **System Prototyping Focus**: REST API integration with dataclass-based response parsing and market analytics
+[Getting Started](#getting-started) | [Architecture](#architecture) | [Usage](#usage) | [Notable Code](#notable-code)
+
+</div>
+
+---
+
+> Part of the **RATU Project** (Real-time Automated Trading Unified) — system-prototyping focus on REST integration, dataclass-typed responses, and consolidated market analytics.
+
+## Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Demo](#demo)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [How It Works](#how-it-works)
+- [Project Structure](#project-structure)
+- [Notable Code](#notable-code)
+- [Architectural Decisions](#architectural-decisions)
+- [Testing](#testing)
+- [Roadmap](#roadmap)
+- [License](#license)
+- [Author](#author)
 
 ## Features
 
-| Feature | Description |
-|---------|-------------|
-| **Market Snapshot** | Comprehensive analytics for any trading pair |
-| **Price Data** | Current price, 24h statistics, weighted average |
-| **Order Book** | Depth analysis with bid/ask ratios |
-| **Trade Analysis** | Recent trades with buy/sell breakdown |
-| **Multi-Timeframe** | Kline data for 1h, 4h, 1d intervals |
-| **No Auth Required** | Uses only public endpoints |
+- **Single-call market snapshot** — combines 7 Binance public endpoints (price, 24hr stats, depth, trades, klines × 3 timeframes, bookTicker, avgPrice) into one structured output
+- **Order-book depth analysis** — top-20 bid/ask depth with bid/ask ratio and spread
+- **Recent trade flow** — buy/sell breakdown across the last 100 trades
+- **Multi-timeframe klines** — 1h / 4h / 1d candles for context spanning intraday → daily
+- **No auth, no rate-limit headaches** — uses only public endpoints, no API key required
+- **JSON snapshot files** — timestamped `snapshots/<symbol>_<ts>.json` for offline analysis
 
-## Usage
+## Tech Stack
 
-```bash
-# Sync dependencies
-uv sync
+| Component | Technology |
+|-----------|------------|
+| Language | Python 3.10+ |
+| Package manager | `uv` |
+| HTTP client | `httpx` (sync, connection-pooled) |
+| Data source | Binance Public REST API (`api.binance.com/api/v3/*`) |
+| Models | `dataclass` response types |
+| Output | JSON snapshots + console |
+| Tests | `pytest`, `pytest-asyncio` |
 
-# Create comprehensive market snapshot (saves to snapshots/)
-uv run market-snapshot ETHUSDT
+## Architecture
 
-# Show basic market info only (no file saved)
-uv run market-snapshot ETHUSDT info
+```mermaid
+graph TD
+    subgraph CLI
+        MAIN["main.py<br/>market-snapshot"]
+    end
 
-# Other pairs
-uv run market-snapshot BTCUSDT
-uv run market-snapshot SOLUSDT
+    subgraph Core
+        SNAP["snapshot builder<br/>snapshot.py"]
+        CLIENT["BinanceClient<br/>binance_client.py"]
+    end
+
+    subgraph "Binance Public REST API"
+        PRICE["/ticker/price"]
+        STATS["/ticker/24hr"]
+        DEPTH["/depth"]
+        TRADES["/trades"]
+        KLINES["/klines"]
+        AVG["/avgPrice"]
+        BOOK["/ticker/bookTicker"]
+    end
+
+    subgraph Output
+        JSON[("snapshots/*.json")]
+        CONSOLE["Console summary"]
+    end
+
+    MAIN --> SNAP
+    SNAP --> CLIENT
+    CLIENT --> PRICE
+    CLIENT --> STATS
+    CLIENT --> DEPTH
+    CLIENT --> TRADES
+    CLIENT --> KLINES
+    CLIENT --> AVG
+    CLIENT --> BOOK
+    SNAP --> JSON
+    MAIN --> CONSOLE
+
+    style MAIN fill:#0f3460,color:#fff
+    style SNAP fill:#533483,color:#fff
+    style CLIENT fill:#16213e,color:#fff
+    style PRICE fill:#16213e,color:#fff
+    style STATS fill:#16213e,color:#fff
+    style DEPTH fill:#16213e,color:#fff
+    style TRADES fill:#16213e,color:#fff
+    style KLINES fill:#16213e,color:#fff
+    style AVG fill:#16213e,color:#fff
+    style BOOK fill:#16213e,color:#fff
+    style JSON fill:#0f3460,color:#fff
+    style CONSOLE fill:#0f3460,color:#fff
 ```
 
-### Sample Output - Snapshot
+## Demo
+
+### Snapshot summary — `uv run market-snapshot ETHUSDT`
 
 ```
 ================================================================================
@@ -67,7 +142,7 @@ uv run market-snapshot SOLUSDT
   Snapshot saved to: snapshots/ethusdt_*.json
 ```
 
-### Sample Snapshot JSON
+### Snapshot JSON
 
 ```json
 {
@@ -93,90 +168,150 @@ uv run market-snapshot SOLUSDT
 }
 ```
 
-## System Overview
+## Getting Started
 
-```mermaid
-flowchart TB
-    subgraph "Market Snapshot CLI"
-        MAIN["main.py"]
-        SNAPSHOT["snapshot.py"]
-        CLIENT["binance_client.py"]
-    end
-    
-    subgraph "Binance Public API"
-        TICKER["/ticker/24hr"]
-        DEPTH["/depth"]
-        TRADES["/trades"]
-        KLINES["/klines"]
-    end
-    
-    subgraph "Output"
-        JSON["snapshots/*.json"]
-        CONSOLE["Console Output"]
-    end
-    
-    MAIN --> SNAPSHOT
-    SNAPSHOT --> CLIENT
-    CLIENT --> TICKER & DEPTH & TRADES & KLINES
-    SNAPSHOT --> JSON
-    MAIN --> CONSOLE
-    
-    style CLIENT fill:#4A90E2
-    style SNAPSHOT fill:#7ED321
+### Prerequisites
+
+- Python 3.10+
+- `uv` — see [install instructions](https://docs.astral.sh/uv/getting-started/installation/)
+- No API key — Binance public endpoints are unauthenticated
+
+### Installation
+
+```bash
+git clone https://github.com/adityonugrohoid/ratu-rest-api.git
+cd ratu-rest-api
+uv sync
 ```
 
-## API Endpoints Used
+### Configuration
 
-All endpoints are public and require no authentication:
+```bash
+cp .env.example .env
+```
 
-| Endpoint | Description |
-|----------|-------------|
-| `/api/v3/ticker/price` | Current price |
-| `/api/v3/ticker/24hr` | 24-hour statistics |
-| `/api/v3/depth` | Order book depth |
-| `/api/v3/trades` | Recent trades |
-| `/api/v3/klines` | Candlestick data |
-| `/api/v3/avgPrice` | 5-minute average price |
-| `/api/v3/ticker/bookTicker` | Best bid/ask |
+| Variable | Required | Default | Purpose |
+|----------|----------|---------|---------|
+| `LOG_LEVEL` | No | `INFO` | Python logging level |
+
+## Usage
+
+```bash
+# Full snapshot — all 7 endpoints, console + JSON file
+uv run market-snapshot ETHUSDT
+
+# Basic info only — 24hr ticker + price, no file written
+uv run market-snapshot ETHUSDT info
+
+# Any USDT pair
+uv run market-snapshot BTCUSDT
+uv run market-snapshot SOLUSDT
+```
+
+## How It Works
+
+### 1. Snapshot pipeline
+
+`snapshot.py` walks `BinanceClient`'s seven public endpoints in sequence on the same connection pool, parses each response into a typed dataclass, then assembles the combined result:
+
+| Section | Source endpoint(s) |
+|---------|--------------------|
+| Summary | `/ticker/24hr`, `/ticker/price`, `/avgPrice` |
+| Order book | `/depth?limit=20` |
+| Trade flow | `/trades?limit=100` |
+| Klines | `/klines` × `1h`, `4h`, `1d` |
+| Spread | `/ticker/bookTicker` |
+
+### 2. Order-book depth aggregation
+
+Sums `qty` across the top-20 bids and top-20 asks separately, then computes `bid/ask ratio` and absolute `spread = best_ask - best_bid`. The ratio is a quick directional bias indicator — values > 1 mean more depth supporting the price than resisting it.
+
+### 3. Trade-flow classification
+
+For the last 100 trades, splits by Binance's `isBuyerMaker` flag:
+
+- `isBuyerMaker == false` → market buy (taker bought)
+- `isBuyerMaker == true` → market sell (taker sold)
+
+Reports both counts and a buy/sell ratio.
+
+### 4. Snapshot file output
+
+Snapshots write to `snapshots/<symbol>_<timestamp>.json` with full sub-section payloads — designed for offline backtesting, dashboards, or comparing two timestamps.
 
 ## Project Structure
 
 ```
 ratu-rest-api/
-  src/rest_api/
-    __init__.py
-    config.py           # API settings
-    binance_client.py   # REST API client
-    snapshot.py         # Market analytics
-    main.py             # CLI entry point
-  tests/
-  snapshots/            # Output directory
+├── src/rest_api/
+│   ├── main.py             # CLI: market-snapshot entrypoint
+│   ├── config.py           # API base URL, default symbols
+│   ├── binance_client.py   # BinanceClient (httpx) + dataclass response types
+│   └── snapshot.py         # 7-endpoint pipeline + JSON writer
+├── tests/
+│   ├── conftest.py
+│   ├── test_config.py              # config validation
+│   ├── test_binance_client.py      # client unit tests
+│   └── test_binance_client_api.py  # live API contract checks
+├── snapshots/              # JSON output (gitignored)
+├── .env.example
+├── pyproject.toml          # uv-managed, Python 3.10+
+└── NOTABLE_CODE.md
 ```
-
-## Design Decisions
-
-| Decision | Rationale |
-|----------|-----------|
-| httpx | Connection pooling for multiple API calls |
-| Dataclasses | Type-safe response parsing |
-| No auth | Public endpoints only, no API key needed |
-| Multi-timeframe | 1h, 4h, 1d klines for trend analysis |
 
 ## Notable Code
 
-This repository demonstrates prototyping-focused REST API integration patterns. See [NOTABLE_CODE.md](NOTABLE_CODE.md) for detailed code examples highlighting:
+> See [NOTABLE_CODE.md](NOTABLE_CODE.md) for annotated walk-throughs of the multi-endpoint snapshot pipeline, dataclass response models, and connection-pooling setup.
 
-- Multi-endpoint integration
-- Dataclass-based response parsing
-- Multi-timeframe analysis
+## Architectural Decisions
+
+### 1. Public endpoints only
+
+**Decision:** Use exclusively unauthenticated Binance endpoints; no API-key support.
+
+**Reasoning:** This tool is a market-analytics snapshot, not an order placer. Removing auth removes a class of secret-handling bugs and lets the repo run end-to-end in CI without any credential setup. Trade-off: cannot access account state or placed orders — out of scope.
+
+### 2. Sequential calls on a pooled client
+
+**Decision:** Walk the seven endpoints one after another on a single `httpx.Client`, not in parallel via async.
+
+**Reasoning:** Total latency is dominated by Binance's per-endpoint response time, not Python's HTTP overhead. Pool reuse already eliminates TCP handshake cost. Sequential code is easier to read, reason about, and debug; async would buy ~100ms at the cost of materially more complexity.
+
+### 3. Dataclass response models, not raw dicts
+
+**Decision:** Every endpoint response is parsed into a typed dataclass before downstream code touches it.
+
+**Reasoning:** The API returns numbers as strings; rolling that conversion into the dataclass `__post_init__` means downstream analytics never trip on string-vs-float arithmetic. Cost is ~50 lines of dataclass plumbing per response shape.
+
+## Testing
+
+```bash
+uv run pytest tests/ -v
+```
+
+| Module | Coverage |
+|--------|----------|
+| `test_config.py` | Config defaults, base URL |
+| `test_binance_client.py` | Client unit tests — request building, dataclass parsing |
+| `test_binance_client_api.py` | Live API contract checks against Binance public endpoints |
+
+## Roadmap
+
+- [x] 7-endpoint single-call snapshot
+- [x] Multi-timeframe klines (1h / 4h / 1d)
+- [x] Trade flow classification
+- [x] JSON snapshot persistence
+- [ ] Snapshot diff / replay tooling
+- [ ] WebSocket streaming snapshot variant
+- [ ] Optional Bybit / OKX adapters behind same interface
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT — see [LICENSE](LICENSE).
 
 ## Author
 
-**Adityo Nugroho**  
-- Portfolio: https://adityonugrohoid.github.io  
-- GitHub: https://github.com/adityonugrohoid  
-- LinkedIn: https://www.linkedin.com/in/adityonugrohoid/
+**Adityo Nugroho** ([@adityonugrohoid](https://github.com/adityonugrohoid))
+
+- Portfolio: [adityonugrohoid.github.io](https://adityonugrohoid.github.io)
+- LinkedIn: [linkedin.com/in/adityonugrohoid](https://www.linkedin.com/in/adityonugrohoid/)

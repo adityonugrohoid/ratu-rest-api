@@ -6,11 +6,10 @@
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![RATU Project](https://img.shields.io/badge/project-RATU-blueviolet.svg)](https://github.com/adityonugrohoid/ratu-template)
-[![Status](https://img.shields.io/badge/status-active-success.svg)](#)
 
 **Comprehensive Binance market snapshots — price, depth, trade flow, and multi-timeframe klines via the public REST API. No auth required.**
 
-[Getting Started](#getting-started) | [Architecture](#architecture) | [Usage](#usage) | [Notable Code](#notable-code)
+[Getting Started](#getting-started) | [Usage](#usage) | [Architecture](#architecture)
 
 </div>
 
@@ -25,13 +24,15 @@
 - [Architecture](#architecture)
 - [Demo](#demo)
 - [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Configuration](#configuration)
 - [Usage](#usage)
 - [How It Works](#how-it-works)
 - [Project Structure](#project-structure)
-- [Notable Code](#notable-code)
 - [Architectural Decisions](#architectural-decisions)
 - [Testing](#testing)
-- [Roadmap](#roadmap)
+- [Related Projects](#related-projects)
 - [License](#license)
 - [Author](#author)
 
@@ -256,12 +257,8 @@ ratu-rest-api/
 ├── snapshots/              # JSON output (gitignored)
 ├── .env.example
 ├── pyproject.toml          # uv-managed, Python 3.10+
-└── NOTABLE_CODE.md
+└── uv.lock
 ```
-
-## Notable Code
-
-> See [NOTABLE_CODE.md](NOTABLE_CODE.md) for annotated walk-throughs of the multi-endpoint snapshot pipeline, dataclass response models, and connection-pooling setup.
 
 ## Architectural Decisions
 
@@ -295,19 +292,18 @@ uv run pytest tests/ -v
 | `test_binance_client.py` | Client unit tests — request building, dataclass parsing |
 | `test_binance_client_api.py` | Live API contract checks against Binance public endpoints |
 
-## Roadmap
+## Related Projects
 
-- [x] 7-endpoint single-call snapshot
-- [x] Multi-timeframe klines (1h / 4h / 1d)
-- [x] Trade flow classification
-- [x] JSON snapshot persistence
-- [ ] Snapshot diff / replay tooling
-- [ ] WebSocket streaming snapshot variant
-- [ ] Optional Bybit / OKX adapters behind same interface
+| Project | Description |
+|---------|-------------|
+| [ratu-template](https://github.com/adityonugrohoid/ratu-template) | Prototype scaffolding and foundational patterns for RATU ecosystem |
+| [ratu-moon-radar](https://github.com/adityonugrohoid/ratu-moon-radar) | Altcoin discovery via on-chain flow anomalies and exchange data |
+| [ratu-onchain-monitor](https://github.com/adityonugrohoid/ratu-onchain-monitor) | Real-time blockchain state snapshots and smart contract monitoring |
+| [ratu-fix-bot](https://github.com/adityonugrohoid/ratu-fix-bot) | FIX protocol gateway for automated order execution and market making |
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
 
 ## Author
 

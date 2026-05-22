@@ -5,9 +5,8 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![RATU Project](https://img.shields.io/badge/project-RATU-blueviolet.svg)](https://github.com/adityonugrohoid/ratu-template)
 
-**Comprehensive Binance market snapshots — price, depth, trade flow, and multi-timeframe klines via the public REST API. No auth required.**
+**Binance market snapshot client: price, depth, trade flow, and multi-timeframe klines via public REST API**
 
 [Getting Started](#getting-started) | [Usage](#usage) | [Architecture](#architecture)
 
@@ -15,22 +14,19 @@
 
 ---
 
-> Part of the **RATU Project** (Real-time Automated Trading Unified) — system-prototyping focus on REST integration, dataclass-typed responses, and consolidated market analytics.
-
 ## Table of Contents
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
-- [Demo](#demo)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Configuration](#configuration)
 - [Usage](#usage)
 - [How It Works](#how-it-works)
-- [Project Structure](#project-structure)
 - [Architectural Decisions](#architectural-decisions)
+- [Project Structure](#project-structure)
 - [Testing](#testing)
 - [Related Projects](#related-projects)
 - [License](#license)
@@ -38,12 +34,12 @@
 
 ## Features
 
-- **Single-call market snapshot** — combines 7 Binance public endpoints (price, 24hr stats, depth, trades, klines × 3 timeframes, bookTicker, avgPrice) into one structured output
-- **Order-book depth analysis** — top-20 bid/ask depth with bid/ask ratio and spread
-- **Recent trade flow** — buy/sell breakdown across the last 100 trades
-- **Multi-timeframe klines** — 1h / 4h / 1d candles for context spanning intraday → daily
-- **No auth, no rate-limit headaches** — uses only public endpoints, no API key required
-- **JSON snapshot files** — timestamped `snapshots/<symbol>_<ts>.json` for offline analysis
+- **Single-call market snapshot** - combines 7 Binance public endpoints (price, 24hr stats, depth, trades, klines x 3 timeframes, bookTicker, avgPrice) into one structured output
+- **Order-book depth analysis** - top-20 bid/ask depth with bid/ask ratio and spread
+- **Recent trade flow** - buy/sell breakdown across the last 100 trades
+- **Multi-timeframe klines** - 1h / 4h / 1d candles for intraday to daily context
+- **No auth required** - uses only public endpoints, no API key needed
+- **JSON snapshot files** - timestamped `snapshots/<symbol>_<ts>.json` for offline analysis
 
 ## Tech Stack
 
@@ -66,7 +62,7 @@ graph TD
     end
 
     subgraph Core
-        SNAP["snapshot builder<br/>snapshot.py"]
+        SNAP["snapshot.py<br/>snapshot builder"]
         CLIENT["BinanceClient<br/>binance_client.py"]
     end
 
@@ -75,7 +71,7 @@ graph TD
         STATS["/ticker/24hr"]
         DEPTH["/depth"]
         TRADES["/trades"]
-        KLINES["/klines"]
+        KLINES["/klines (1h/4h/1d)"]
         AVG["/avgPrice"]
         BOOK["/ticker/bookTicker"]
     end
@@ -111,71 +107,13 @@ graph TD
     style CONSOLE fill:#0f3460,color:#fff
 ```
 
-## Demo
-
-### Snapshot summary — `uv run market-snapshot ETHUSDT`
-
-```
-================================================================================
-  MARKET SNAPSHOT - ETHUSDT
-================================================================================
-  Symbol: ETHUSDT
-  Price: $3,890.45
-  24h Change: +45.20 (+1.18%)
-  24h Range: $3,820.00 - $3,950.00
-  24h Volume: 245,000.00 ETH
-  24h Quote Volume: $952,000,000.00
-  24h Trades: 1,250,000
-
-  Order Book Depth (top 20 levels):
-    Total Bid Depth: 125.5000
-    Total Ask Depth: 118.2000
-    Bid/Ask Ratio: 1.06
-
-  Recent Trade Analysis (last 100):
-    Buy Trades: 52 (52.0%)
-    Sell Trades: 48 (48.0%)
-    Buy/Sell Ratio: 1.08
-    Avg Trade Size: 0.4500
-
-  Spread: $0.0100 (0.0003%)
-
-  Snapshot saved to: snapshots/ethusdt_*.json
-```
-
-### Snapshot JSON
-
-```json
-{
-  "timestamp": "2025-12-12T17:00:00.000000",
-  "symbol": "ETHUSDT",
-  "summary": {
-    "price": 3890.45,
-    "price_change_24h": 45.20,
-    "price_change_percent_24h": 1.18,
-    "volume_24h": 245000.0,
-    "trade_count_24h": 1250000
-  },
-  "depth_analysis": {
-    "total_bid_depth": 125.5,
-    "total_ask_depth": 118.2,
-    "bid_ask_ratio": 1.06
-  },
-  "trade_analysis": {
-    "buy_trades": 52,
-    "sell_trades": 48,
-    "buy_sell_ratio": 1.08
-  }
-}
-```
-
 ## Getting Started
 
 ### Prerequisites
 
 - Python 3.10+
-- `uv` — see [install instructions](https://docs.astral.sh/uv/getting-started/installation/)
-- No API key — Binance public endpoints are unauthenticated
+- `uv` - see [install instructions](https://docs.astral.sh/uv/getting-started/installation/)
+- No API key - Binance public endpoints are unauthenticated
 
 ### Installation
 
@@ -198,10 +136,10 @@ cp .env.example .env
 ## Usage
 
 ```bash
-# Full snapshot — all 7 endpoints, console + JSON file
+# Full snapshot: all 7 endpoints, console + JSON file
 uv run market-snapshot ETHUSDT
 
-# Basic info only — 24hr ticker + price, no file written
+# Basic info only: 24hr ticker + price, no file written
 uv run market-snapshot ETHUSDT info
 
 # Any USDT pair
@@ -220,45 +158,25 @@ uv run market-snapshot SOLUSDT
 | Summary | `/ticker/24hr`, `/ticker/price`, `/avgPrice` |
 | Order book | `/depth?limit=20` |
 | Trade flow | `/trades?limit=100` |
-| Klines | `/klines` × `1h`, `4h`, `1d` |
+| Klines | `/klines` x `1h`, `4h`, `1d` |
 | Spread | `/ticker/bookTicker` |
 
 ### 2. Order-book depth aggregation
 
-Sums `qty` across the top-20 bids and top-20 asks separately, then computes `bid/ask ratio` and absolute `spread = best_ask - best_bid`. The ratio is a quick directional bias indicator — values > 1 mean more depth supporting the price than resisting it.
+Sums `qty` across the top-20 bids and top-20 asks separately, then computes `bid/ask ratio` and absolute `spread = best_ask - best_bid`. The ratio is a directional bias indicator: values above 1 mean more depth supporting the price than resisting it.
 
 ### 3. Trade-flow classification
 
 For the last 100 trades, splits by Binance's `isBuyerMaker` flag:
 
-- `isBuyerMaker == false` → market buy (taker bought)
-- `isBuyerMaker == true` → market sell (taker sold)
+- `isBuyerMaker == false` - market buy (taker bought)
+- `isBuyerMaker == true` - market sell (taker sold)
 
 Reports both counts and a buy/sell ratio.
 
 ### 4. Snapshot file output
 
-Snapshots write to `snapshots/<symbol>_<timestamp>.json` with full sub-section payloads — designed for offline backtesting, dashboards, or comparing two timestamps.
-
-## Project Structure
-
-```
-ratu-rest-api/
-├── src/rest_api/
-│   ├── main.py             # CLI: market-snapshot entrypoint
-│   ├── config.py           # API base URL, default symbols
-│   ├── binance_client.py   # BinanceClient (httpx) + dataclass response types
-│   └── snapshot.py         # 7-endpoint pipeline + JSON writer
-├── tests/
-│   ├── conftest.py
-│   ├── test_config.py              # config validation
-│   ├── test_binance_client.py      # client unit tests
-│   └── test_binance_client_api.py  # live API contract checks
-├── snapshots/              # JSON output (gitignored)
-├── .env.example
-├── pyproject.toml          # uv-managed, Python 3.10+
-└── uv.lock
-```
+Snapshots write to `snapshots/<symbol>_<timestamp>.json` with full sub-section payloads, suited for offline backtesting, dashboards, or comparing two timestamps.
 
 ## Architectural Decisions
 
@@ -266,19 +184,39 @@ ratu-rest-api/
 
 **Decision:** Use exclusively unauthenticated Binance endpoints; no API-key support.
 
-**Reasoning:** This tool is a market-analytics snapshot, not an order placer. Removing auth removes a class of secret-handling bugs and lets the repo run end-to-end in CI without any credential setup. Trade-off: cannot access account state or placed orders — out of scope.
+**Reasoning:** This client targets market-analytics snapshots, not order placement. Removing auth removes a class of secret-handling bugs and lets the repo run end-to-end in CI without credential setup. Trade-off: no access to account state or placed orders, which is out of scope.
 
 ### 2. Sequential calls on a pooled client
 
 **Decision:** Walk the seven endpoints one after another on a single `httpx.Client`, not in parallel via async.
 
-**Reasoning:** Total latency is dominated by Binance's per-endpoint response time, not Python's HTTP overhead. Pool reuse already eliminates TCP handshake cost. Sequential code is easier to read, reason about, and debug; async would buy ~100ms at the cost of materially more complexity.
+**Reasoning:** Total latency is dominated by Binance's per-endpoint response time (~50-100ms each), not Python's HTTP overhead. Pool reuse already eliminates TCP handshake cost. Sequential code is easier to read and debug; async would save roughly 100ms at the cost of materially more complexity.
 
 ### 3. Dataclass response models, not raw dicts
 
 **Decision:** Every endpoint response is parsed into a typed dataclass before downstream code touches it.
 
-**Reasoning:** The API returns numbers as strings; rolling that conversion into the dataclass `__post_init__` means downstream analytics never trip on string-vs-float arithmetic. Cost is ~50 lines of dataclass plumbing per response shape.
+**Reasoning:** The Binance API returns numbers as strings. Rolling that conversion into the dataclass `__post_init__` means downstream analytics never encounter string-vs-float arithmetic errors. Cost is ~50 lines of dataclass plumbing per response shape.
+
+## Project Structure
+
+```
+ratu-rest-api/
+├── src/rest_api/
+│   ├── main.py             # CLI: market-snapshot entrypoint
+│   ├── config.py           # API base URL, log level, output paths
+│   ├── binance_client.py   # BinanceClient (httpx) + dataclass response types
+│   └── snapshot.py         # 7-endpoint pipeline + JSON writer
+├── tests/
+│   ├── conftest.py
+│   ├── test_config.py              # Config defaults, base URL
+│   ├── test_binance_client.py      # Client unit tests: request building, dataclass parsing
+│   └── test_binance_client_api.py  # Live API contract checks against Binance public endpoints
+├── snapshots/              # JSON output (gitignored)
+├── .env.example
+├── pyproject.toml          # uv-managed, Python 3.10+
+└── uv.lock
+```
 
 ## Testing
 
@@ -289,17 +227,8 @@ uv run pytest tests/ -v
 | Module | Coverage |
 |--------|----------|
 | `test_config.py` | Config defaults, base URL |
-| `test_binance_client.py` | Client unit tests — request building, dataclass parsing |
+| `test_binance_client.py` | Client unit tests: request building, dataclass parsing |
 | `test_binance_client_api.py` | Live API contract checks against Binance public endpoints |
-
-## Related Projects
-
-| Project | Description |
-|---------|-------------|
-| [ratu-template](https://github.com/adityonugrohoid/ratu-template) | Prototype scaffolding and foundational patterns for RATU ecosystem |
-| [ratu-moon-radar](https://github.com/adityonugrohoid/ratu-moon-radar) | Altcoin discovery via on-chain flow anomalies and exchange data |
-| [ratu-onchain-monitor](https://github.com/adityonugrohoid/ratu-onchain-monitor) | Real-time blockchain state snapshots and smart contract monitoring |
-| [ratu-fix-bot](https://github.com/adityonugrohoid/ratu-fix-bot) | FIX protocol gateway for automated order execution and market making |
 
 ## License
 

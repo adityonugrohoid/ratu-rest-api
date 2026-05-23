@@ -3,7 +3,7 @@
 # RATU REST API
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
+[![uv](https://img.shields.io/badge/uv-package%20manager-blueviolet)](https://github.com/astral-sh/uv)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Binance market snapshot client: price, depth, trade flow, and multi-timeframe klines via public REST API**
@@ -229,6 +229,15 @@ uv run pytest tests/ -v
 | `test_config.py` | Config defaults, base URL |
 | `test_binance_client.py` | Client unit tests: request building, dataclass parsing |
 | `test_binance_client_api.py` | Live API contract checks against Binance public endpoints |
+
+## Related Projects
+
+| Project | Description |
+|---------|-------------|
+| [ratu-template](https://github.com/adityonugrohoid/ratu-template) | Opinionated Python scaffold for real-time, event-driven trading and monitoring systems |
+| [ratu-moon-radar](https://github.com/adityonugrohoid/ratu-moon-radar) | Multi-chain DEX pair scanner and trending-token detector via Moralis API |
+| [ratu-onchain-monitor](https://github.com/adityonugrohoid/ratu-onchain-monitor) | On-chain token holder analytics and whale tracker via Ankr API |
+| [ratu-fix-bot](https://github.com/adityonugrohoid/ratu-fix-bot) | Low-latency Binance FIX 4.4 bot with ED25519 auth and a spread market-making loop |
 
 ## License
 
